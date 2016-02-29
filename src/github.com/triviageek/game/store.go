@@ -1,4 +1,4 @@
-package store
+package game
 
 import (
 	"math/rand"

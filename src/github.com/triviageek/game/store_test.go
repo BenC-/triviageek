@@ -1,7 +1,6 @@
-package store
+package game
 
 import (
-	"fmt"
 	"testing"
 )
 
@@ -20,15 +19,24 @@ func TestGenerateQuestions(t *testing.T) {
 	if len(q.suggestions[0]) == 0 {
 		t.Fatal("suggestion should not be empty", q)
 	}
-	fmt.Println(q)
 }
 
 func BenchmarkGenerate10000RandomNums(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		shuffledKeys := make(chan int, 300)
 		go generateRandomSeries(shuffledKeys)
-		for i := 0; i < 100000; i++ {
+		for i := 0; i < 10000; i++ {
 			<-shuffledKeys
+		}
+	}
+}
+
+func BenchmarkGenerate1000Questions(b *testing.B) {
+	Init()
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		for i := 0; i < 1000; i++ {
+			<-Questions
 		}
 	}
 }

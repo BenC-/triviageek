@@ -1,4 +1,4 @@
-package store
+package game
 
 // see http://industriallogic.com/wp-content/uploads/2005/09/smellstorefactorings.pdf
 var smells = []Smell{

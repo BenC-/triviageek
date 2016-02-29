@@ -4,10 +4,11 @@ import (
 	"fmt"
 
 	"github.com/triviageek/store"
+	"time"
 )
 
 func main() {
 	fmt.Println("Application starting...")
-	store.InitBank()
-
+	game.Init()
+	time.After()
 }
