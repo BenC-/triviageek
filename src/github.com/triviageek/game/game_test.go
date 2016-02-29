@@ -6,11 +6,14 @@ import (
 
 func TestCreateGame(t *testing.T) {
 	Init()
-	questions := createOrJoinAGame()
-
-	questions
-
-	q := <-Questions
+	questions, game := createOrJoinAGame()
+	if game.started == true {
+		t.Fatal("Game should not have started yet")
+	}
+	q := <-questions
+	if game.started == false {
+		t.Fatal("Game should have started now")
+	}
 	if q.smell.description == "" {
 		t.Fatal("question.smell is null")
 	}

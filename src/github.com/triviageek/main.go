@@ -2,13 +2,29 @@ package main
 
 import (
 	"fmt"
+	"net/http"
 
-	"github.com/triviageek/store"
-	"time"
+	"golang.org/x/net/websocket"
+
+	"github.com/triviageek/game"
 )
 
 func main() {
 	fmt.Println("Application starting...")
 	game.Init()
-	time.After()
+
+	http.Handle("/", websocket.Handler(triviaHandler))
+
+	err := http.ListenAndServe(":8080", nil)
+	if err != nil {
+		panic("ListenAndServe: " + err.Error())
+	}
+
+}
+
+func triviaHandler(ws *websocket.Conn) {
+	defer ws.Close()
+
+	incomingReq := ws.Read()
+
 }
