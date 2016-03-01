@@ -5,12 +5,7 @@ import (
 	"time"
 )
 
-var Questions = make(chan Question, 1000)
-
-type Question struct {
-	smell       Smell
-	suggestions []string
-}
+var store = make(chan Question, 1000)
 
 type Smell struct {
 	name        string
@@ -33,7 +28,7 @@ func Init() {
 				j := rand.Intn(i + 1)
 				sugs[i], sugs[j] = sugs[j], sugs[i]
 			}
-			Questions <- Question{smell, sugs}
+			store <- Question{0, smell, sugs}
 		}
 	}()
 

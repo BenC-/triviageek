@@ -6,7 +6,10 @@ import (
 
 func TestCreateGame(t *testing.T) {
 	Init()
-	questions, game := createOrJoinAGame()
+	questions, game := CreateOrJoinAGame()
+	if len(game.players) == 0 {
+		t.Fatal("A game cannot be created with no players")
+	}
 	if game.started == true {
 		t.Fatal("Game should not have started yet")
 	}

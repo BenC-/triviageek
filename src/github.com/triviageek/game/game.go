@@ -7,19 +7,25 @@ import (
 
 var runningGames []*Game
 
-type Player struct {
-	pseudo string
-	game   *Game
-	score  int
-}
-
 type Game struct {
 	started bool
 	ticker  *time.Ticker
 	players []chan Question
 }
 
-func createOrJoinAGame() (<-chan Question, *Game) {
+type Question struct {
+	step        int
+	smell       Smell
+	suggestions []string
+}
+
+type Response struct {
+	step        int
+	success     bool
+	suggestions []string
+}
+
+func CreateOrJoinAGame() (<-chan Question, *Game) {
 	qChan := make(chan Question, 1)
 	for _, game := range runningGames {
 		if game.started == false {
@@ -34,11 +40,14 @@ func createOrJoinAGame() (<-chan Question, *Game) {
 }
 
 func (g *Game) start() {
+	var currentStep int
 	// Send a question every 20 sec
 	for range g.ticker.C {
+		currentStep++
 		g.started = true
 		fmt.Println("Send questions to player(s)", len(g.players))
-		q := <-Questions
+		q := <-store
+		q.step = currentStep
 		for _, player := range g.players {
 			player <- q
 		}

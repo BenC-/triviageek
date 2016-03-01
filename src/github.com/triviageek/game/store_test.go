@@ -6,7 +6,7 @@ import (
 
 func TestGenerateQuestions(t *testing.T) {
 	Init()
-	q := <-Questions
+	q := <-store
 	if q.smell.description == "" {
 		t.Fatal("question.smell is null")
 	}
@@ -36,7 +36,7 @@ func BenchmarkGenerate1000Questions(b *testing.B) {
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
 		for i := 0; i < 1000; i++ {
-			<-Questions
+			<-store
 		}
 	}
 }
