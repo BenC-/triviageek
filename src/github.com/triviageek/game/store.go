@@ -8,8 +8,8 @@ import (
 var store = make(chan Question, 1000)
 
 type Smell struct {
-	name        string
-	description string
+	Name        string `json:"name"`
+	Description string `json:"description"`
 }
 
 func Init() {
@@ -22,8 +22,7 @@ func Init() {
 	go func() {
 		for {
 			smell := smells[<-shuffledKeys]
-			sugs := []string{smell.name, smells[<-shuffledKeys].name, smells[<-shuffledKeys].name}
-
+			sugs := []string{smell.Name, smells[<-shuffledKeys].Name, smells[<-shuffledKeys].Name}
 			for i := range sugs {
 				j := rand.Intn(i + 1)
 				sugs[i], sugs[j] = sugs[j], sugs[i]

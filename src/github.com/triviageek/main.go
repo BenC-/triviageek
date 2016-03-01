@@ -28,51 +28,70 @@ func triviaHandler(ws *websocket.Conn) {
 
 	fmt.Println("Incoming connection from", ws.RemoteAddr().Network())
 
-	frameReader, err := ws.NewFrameReader()
-
+	receivedBytes := make([]byte, 100)
+	n, err := ws.Read(receivedBytes)
 	if err != nil {
 		fmt.Println("Not a websocket request, close connection", err)
-		return
 	}
 
-	frameReader.TrailerReader()
-	newPlayer := &game.Player{}
-	if err := json.Unm(frameReader).Decode(newPlayer); err != nil {
+	player := &game.Player{}
+	if err := json.Unmarshal(receivedBytes[:n], player); err != nil {
 		fmt.Println("Bad request, this is not a player. Close connection", err)
 		return
 	}
+
+	fmt.Println("New player :", *player)
 
 	questions, joiningGame := game.CreateOrJoinAGame()
 
 	b, err := json.Marshal(joiningGame)
 	if err != nil {
-		fmt.Println("Unable to mashall new player, WTF ?!", err)
+		fmt.Println("Unable to marshall game, WTF ?!", err)
 		return
 	}
-
-	// Write game
 	ws.Write(b)
+
+	// Complete player
+	player.Game = joiningGame
 
 	// Send periodic questions
 	go func(<-chan game.Question) {
 		for question := range questions {
+			fmt.Println(question)
 			b, err := json.Marshal(question)
 			if err != nil {
-				fmt.Println("Unable to mashall question, WTF ?!", err)
+				fmt.Println("Unable to marshall question, WTF ?!", err)
 				return
 			}
 			ws.Write(b)
 		}
+		fmt.Println("Game Ended")
+		b, err := json.Marshal(player)
+		if err != nil {
+			fmt.Println("Unable to mashall player, WTF ?!", err)
+			return
+		}
+		ws.Write(b)
+		return
 	}(questions)
 
 	// Read responses
 	for {
+		n, err := ws.Read(receivedBytes)
+		if err != nil {
+			fmt.Println("Error while reading bytes", err)
+		}
+		fmt.Println(string(receivedBytes[:n]))
 		response := &game.Response{}
-		if err := json.NewDecoder(frameReader).Decode(response); err != nil {
-			fmt.Println("Bad request, this is not a questions close connection", err)
+		if err := json.Unmarshal(receivedBytes[:n], response); err != nil {
+			fmt.Println("Bad request, this is not a response close connection", err)
 			return
 		}
 		fmt.Println("Received response", response)
+		if response.Success && response.Step >= joiningGame.Step {
+			player.Score++
+		}
+
 	}
 
 }

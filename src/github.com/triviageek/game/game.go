@@ -5,50 +5,55 @@ import (
 	"time"
 )
 
+const NumOfQuestionsPerGame = 12
+
 var runningGames []*Game
 
 type Game struct {
-	started bool
-	ticker  *time.Ticker
-	players []chan Question
+	StartTime time.Time `json:"startTime,omitempty"`
+	Step      int       `json:"step,omitempty"`
+	ticker    *time.Ticker
+	toPlayers []chan Question
 }
 
 type Question struct {
-	step        int
-	smell       Smell
-	suggestions []string
+	Step        int      `json:"step,omitempty"`
+	Smell       Smell    `json:"smell,omitempty"`
+	Suggestions []string `json:"suggestions,omitempty"`
 }
 
 type Response struct {
-	step        int
-	success     bool
-	suggestions []string
+	Step    int  `json:"step,omitempty"`
+	Success bool `json:"success,omitempty"`
 }
 
 func CreateOrJoinAGame() (<-chan Question, *Game) {
 	qChan := make(chan Question, 1)
 	for _, game := range runningGames {
-		if game.started == false {
-			game.players = append(game.players, qChan)
+		if game.StartTime.After(time.Now()) {
+			game.toPlayers = append(game.toPlayers, qChan)
 			return qChan, game
 		}
 	}
-	newGame := &Game{ticker: time.NewTicker(20 * time.Second), players: []chan Question{qChan}}
+	newGame := &Game{StartTime: time.Now().Add(time.Second * 20), ticker: time.NewTicker(20 * time.Second), toPlayers: []chan Question{qChan}}
 	runningGames = append(runningGames, newGame)
 	go newGame.start()
 	return qChan, newGame
 }
 
 func (g *Game) start() {
-	var currentStep int
 	// Send a question every 20 sec
 	for range g.ticker.C {
-		currentStep++
-		g.started = true
-		fmt.Println("Send questions to player(s)", len(g.players))
+		g.Step++
+		if g.Step > NumOfQuestionsPerGame {
+			for _, player := range g.toPlayers {
+				close(player)
+			}
+		}
+		fmt.Println("Send questions to player(s)", len(g.toPlayers))
 		q := <-store
-		q.step = currentStep
-		for _, player := range g.players {
+		q.Step = g.Step
+		for _, player := range g.toPlayers {
 			player <- q
 		}
 	}

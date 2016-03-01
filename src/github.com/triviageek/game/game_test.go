@@ -2,31 +2,32 @@ package game
 
 import (
 	"testing"
+	"time"
 )
 
 func TestCreateGame(t *testing.T) {
 	Init()
 	questions, game := CreateOrJoinAGame()
-	if len(game.players) == 0 {
+	if len(game.toPlayers) == 0 {
 		t.Fatal("A game cannot be created with no players")
 	}
-	if game.started == true {
+	if game.StartTime.Before(time.Now()) {
 		t.Fatal("Game should not have started yet")
 	}
 	q := <-questions
-	if game.started == false {
+	if game.StartTime.After(time.Now()) {
 		t.Fatal("Game should have started now")
 	}
-	if q.smell.description == "" {
+	if q.Smell.Description == "" {
 		t.Fatal("question.smell is null")
 	}
-	if q.suggestions == nil {
+	if q.Suggestions == nil {
 		t.Fatal("question.suggestions is null")
 	}
-	if len(q.suggestions) != 3 {
-		t.Fatal("question does not contains 3 proposals", len(q.suggestions))
+	if len(q.Suggestions) != 3 {
+		t.Fatal("question does not contains 3 proposals", len(q.Suggestions))
 	}
-	if len(q.suggestions[0]) == 0 {
+	if len(q.Suggestions[0]) == 0 {
 		t.Fatal("suggestion should not be empty", q)
 	}
 }

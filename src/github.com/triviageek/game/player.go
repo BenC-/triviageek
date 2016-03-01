@@ -1,7 +1,7 @@
 package game
 
 type Player struct {
-	pseudo string
-	game   *Game
-	score  int
+	Pseudo string `json:"pseudo,omitempty"`
+	Game   *Game  `json:"game,omitempty"`
+	Score  int    `json:"score,omitempty"`
 }

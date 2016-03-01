@@ -7,16 +7,16 @@ import (
 func TestGenerateQuestions(t *testing.T) {
 	Init()
 	q := <-store
-	if q.smell.description == "" {
+	if q.Smell.Description == "" {
 		t.Fatal("question.smell is null")
 	}
-	if q.suggestions == nil {
+	if q.Suggestions == nil {
 		t.Fatal("question.suggestions is null")
 	}
-	if len(q.suggestions) != 3 {
-		t.Fatal("question does not contains 3 proposals", len(q.suggestions))
+	if len(q.Suggestions) != 3 {
+		t.Fatal("question does not contains 3 proposals", len(q.Suggestions))
 	}
-	if len(q.suggestions[0]) == 0 {
+	if len(q.Suggestions[0]) == 0 {
 		t.Fatal("suggestion should not be empty", q)
 	}
 }
