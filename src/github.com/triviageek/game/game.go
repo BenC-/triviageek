@@ -2,18 +2,29 @@ package game
 
 import (
 	"fmt"
+	"math/rand"
 	"time"
 )
 
-const NumOfQuestionsPerGame = 12
+const (
+	NumOfQuestionsPerGame = 4
+	QuestionPeriod        = 5
+)
 
 var runningGames []*Game
 
 type Game struct {
+	Name      string
 	StartTime time.Time `json:"startTime,omitempty"`
 	Step      int       `json:"step,omitempty"`
+	Result    string
 	ticker    *time.Ticker
-	toPlayers []chan Question
+	players   []*Player
+	stopChan  chan interface{}
+}
+
+type Result struct {
+	Players []*Player `json:"players"`
 }
 
 type Question struct {
@@ -22,39 +33,47 @@ type Question struct {
 	Suggestions []string `json:"suggestions,omitempty"`
 }
 
-type Response struct {
-	Step    int  `json:"step,omitempty"`
-	Success bool `json:"success,omitempty"`
-}
-
-func CreateOrJoinAGame() (<-chan Question, *Game) {
-	qChan := make(chan Question, 1)
-	for _, game := range runningGames {
-		if game.StartTime.After(time.Now()) {
-			game.toPlayers = append(game.toPlayers, qChan)
-			return qChan, game
-		}
-	}
-	newGame := &Game{StartTime: time.Now().Add(time.Second * 20), ticker: time.NewTicker(20 * time.Second), toPlayers: []chan Question{qChan}}
-	runningGames = append(runningGames, newGame)
-	go newGame.start()
-	return qChan, newGame
+func newGame() *Game {
+	newGame := &Game{Name: randName(), StartTime: time.Now().Add(time.Second * QuestionPeriod), ticker: time.NewTicker(QuestionPeriod * time.Second), players: []*Player{}}
+	return newGame
 }
 
 func (g *Game) start() {
 	// Send a question every 20 sec
-	for range g.ticker.C {
-		g.Step++
-		if g.Step > NumOfQuestionsPerGame {
-			for _, player := range g.toPlayers {
-				close(player)
+	for {
+		select {
+		case <-g.ticker.C:
+			g.Step++
+			if g.Step > NumOfQuestionsPerGame { // End of game
+				g.broadcastResultAndClose()
 			}
-		}
-		fmt.Println("Send questions to player(s)", len(g.toPlayers))
-		q := <-store
-		q.Step = g.Step
-		for _, player := range g.toPlayers {
-			player <- q
+			fmt.Println(fmt.Sprintf("Send questions to %d player(s)", len(g.players)))
+			q := <-store
+			q.Step = g.Step
+			for _, player := range g.players {
+				player.marshalAndSend(q)
+			}
+		case <-g.stopChan:
+			return
 		}
 	}
+}
+
+func (g *Game) broadcastResultAndClose() {
+	result := &Result{g.players}
+	for _, player := range g.players {
+		player.marshalAndSend(result)
+		player.endGame()
+	}
+	g.stopChan <- struct{}{}
+}
+
+var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+func randName() string {
+	b := make([]rune, 6)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+	return string(b)
 }
