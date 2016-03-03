@@ -13,19 +13,24 @@ angular
     'ngResource',
     'ngRoute',
     'ngSanitize',
-    'ngTouch'
+    'ngTouch',
+    'ngWebSocket'
   ])
   .config(function ($routeProvider) {
     $routeProvider
       .when('/main', {
         templateUrl: 'views/main.html',
-        controller: 'MainCtrl',
-        controllerAs: 'main'
+        controller: 'MainCtrl'
       })
       .when('/game', {
         templateUrl: 'views/game.html',
         controller: 'GameCtrl',
         controllerAs: 'game'
+      })
+       .when('/results', {
+        templateUrl: 'views/results.html',
+        controller: 'ResultsCtrl',
+        controllerAs: 'results'
       })
       .otherwise({
         redirectTo: '/main'

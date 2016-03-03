@@ -7,14 +7,13 @@
  * # AboutCtrl
  * Controller of the triviageekguiApp
  */
-angular.module('triviageekguiApp', ['ngWebSocket'])
-  .controller('GameCtrl', function ($websocket) {
+angular.module('triviageekguiApp')
+  .controller('GameCtrl', function ($rootscope) {
 
-  	var dataStream = $websocket('ws://localhost:9000');
-
-
-    dataStream.onMessage(function(message) {
+  	
+    $rootscope.dataStream.onMessage(function(message) {
         // If game
+        console.log(message);
 
         // If question
 
@@ -23,11 +22,11 @@ angular.module('triviageekguiApp', ['ngWebSocket'])
 
 
 
-
+/*
     $scope.sendQuestion = function youpi(){
 
-    dataStream.send(JSON.stringify({ action: 'get' }));
-}
+    dataStream.send(JSON.stringify({ action: 'get' }));*/
+
 
     this.awesomeThings = [];
   });

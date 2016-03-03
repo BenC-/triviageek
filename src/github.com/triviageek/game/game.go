@@ -17,7 +17,6 @@ type Game struct {
 	Name      string
 	StartTime time.Time `json:"startTime,omitempty"`
 	Step      int       `json:"step,omitempty"`
-	Result    string
 	ticker    *time.Ticker
 	players   []*Player
 	stopChan  chan interface{}

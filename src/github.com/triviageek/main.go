@@ -17,7 +17,7 @@ func main() {
 
 	http.Handle("/", websocket.Handler(http_.GameHandler))
 
-	err := http.ListenAndServe(":9000", nil)
+	err := http.ListenAndServe(":9001", nil)
 	if err != nil {
 		panic("ListenAndServe: " + err.Error())
 	}
