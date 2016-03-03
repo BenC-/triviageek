@@ -1,24 +1,23 @@
-<div class="jumbotron">
-  <h1>Learn your smells</h1>
-  <p class="lead">
-    And become a better programer...
-    
+<!-- START GAME -->
+
+<div ng-if="screenMode==='start'">
+  <div class="jumbotron">
+    <h1>Learn your smells</h1>
+    <p class="lead">
+      And enhance your programming skills...
+    </p>
+    <br/>
+
+    <p>
+     <form role="form">
+      <div class="form-group" >
+        <input type="text" class="form-control" ng-model="player.pseudo" placeholder="What's your name ?" />
+      </div>
+    </form>
   </p>
-  <p>
-
   <br/>
-
-<form role="form">
-  <div class="form-group" >
-    <label for="email">Pseudo:</label>
-    <input type="text" class="form-control" ng-model="player.pseudo" />
-  </div>
- </form>
-</p>
-<br/>
-
-
-   <a class="btn btn-lg btn-success" ng-click="startGame()">Start playing <span class="glyphicon glyphicon-ok"></span></a></p>
+  <a ng-if="countDown" class="btn btn-lg">Joining game {{game.name}} in {{countDown}}'</a>
+  <a ng-if="!countDown" class="btn btn-lg btn-success" ng-click="startGame()">Start playing <span class="glyphicon glyphicon-ok"></span></a></p>
 </div>
 
 <div class="row marketing">
@@ -26,4 +25,70 @@
   <p>
     Code Smells go beyond vague programming principles by capturing industry wisdom about how not to design code. One of the nice things about smells is that it's easy for inexperienced people to spot them, even if they don't know enough to evaluate if there's a real problem or to correct them. 
   </p>
+</div>
+
+</div>
+
+<!-- QUESTIONS -->
+<div ng-if="screenMode==='game'">
+  <h2><span class="glyphicon glyphicon-flash"></span> Game : {{game.name}}</h2>
+  <br/>
+
+  <div class="jumbotron">
+
+    <h3>Description</h3>
+    <p class="lead">
+      <br/>
+      {{question.smell.description}}
+      <br/>
+    </p>
+  </div>
+
+  <div class="text-center">
+    <p><a class="btn btn-lg btn-primary btn-block" ng-click="submitAnswer(question.suggestions[0])">{{question.suggestions[0]}}</a></p>
+    <p><a class="btn btn-lg btn-primary btn-block" ng-click="submitAnswer(question.suggestions[1])">{{question.suggestions[1]}}</a></p>
+    <p><a class="btn btn-lg btn-primary btn-block" ng-click="submitAnswer(question.suggestions[2])">{{question.suggestions[2]}}</a></p>
+  </div>
+
+</div>
+
+<!-- GAME RESULTS -->
+<div ng-if="screenMode==='results'">
+
+  <h2><span class="glyphicon glyphicon-flash"></span> Game : {{game.name}}</h2>
+  <h3><span class="glyphicon glyphicon-stats"></span> Results</h3>
+
+  <div class="row">
+    <div class="col-md-8 col-md-offset-2">
+      <div class="panel-body">
+        <div class="table-container">
+          <table class="table table-filter">
+            <tbody>
+              <tr ng-repeat="player in result.players">
+                <td>
+                  <a href="javascript:;" class="star">
+                    <i class="glyphicon glyphicon-star"></i>
+                  </a>
+                </td>
+                <td>
+                  <div class="media">
+                    <a href="#" class="pull-left">
+                      <span style="font-size: 9em" class="pull-left glyphicon glyphicon-user fa-4x"></span> 
+                    </a>
+                    <div class="media-body">
+                      <h4 class="title">
+                        {{player.pseudo}}
+                      </h4>
+                      <h3>{{player.score}}/12</h3>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </div>

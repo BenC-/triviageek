@@ -14,7 +14,7 @@ const (
 var runningGames []*Game
 
 type Game struct {
-	Name      string
+	Name      string    `json:"name,omitempty"`
 	StartTime time.Time `json:"startTime,omitempty"`
 	Step      int       `json:"step,omitempty"`
 	ticker    *time.Ticker
