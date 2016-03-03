@@ -33,7 +33,7 @@
     	$scope.game = object;
     	var startTime = Date.parse(object.startTime);
     	var now = new Date();
-    	$scope.countDown = (now.getTime()-startTime.getTime())/1000
+    	$scope.countDown = Math.ceil((startTime-now.getTime())/1000);
     	$interval(function(){$scope.countDown--;},1000);
     } else if (object.hasOwnProperty('smell')) { // Question
     	$scope.screenMode = 'game';
