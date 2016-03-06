@@ -8,7 +8,7 @@ import (
 var store = make(chan Question, 1000)
 
 type Smell struct {
-	Name        string `json:"name"`
+	Name        string `json:"name, omitempty"`
 	Description string `json:"description"`
 }
 

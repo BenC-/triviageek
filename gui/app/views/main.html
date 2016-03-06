@@ -8,16 +8,18 @@
     </p>
     <br/>
 
+     <form ng-submit="startGame()" role="form">
+
     <p>
-     <form role="form">
       <div class="form-group" >
         <input type="text" class="form-control" ng-model="player.pseudo" placeholder="What's your name ?" />
       </div>
-    </form>
   </p>
   <br/>
-  <a ng-if="countDown" class="btn btn-lg">Joining game {{game.name}} in {{countDown}}'</a>
+  <a ng-if="countDown" class="btn btn-lg">Wait for players. Joining game {{game.name}} in {{countDown}}'</a>
+  <p>
   <a ng-if="!countDown" class="btn btn-lg btn-success" ng-click="startGame()">Start playing <span class="glyphicon glyphicon-ok"></span></a></p>
+  </form>
 </div>
 
 <div class="row marketing">
@@ -36,7 +38,8 @@
 
   <div class="jumbotron">
 
-    <h3>Description</h3>
+    <h3>{{question.step}}/12</h3>
+    <h3>Description</h3> <h4>{{countDown}}'</h4>
     <p class="lead">
       <br/>
       {{question.smell.description}}
@@ -45,9 +48,9 @@
   </div>
 
   <div class="text-center">
-    <p><a class="btn btn-lg btn-primary btn-block" ng-click="submitAnswer(question.suggestions[0])">{{question.suggestions[0]}}</a></p>
-    <p><a class="btn btn-lg btn-primary btn-block" ng-click="submitAnswer(question.suggestions[1])">{{question.suggestions[1]}}</a></p>
-    <p><a class="btn btn-lg btn-primary btn-block" ng-click="submitAnswer(question.suggestions[2])">{{question.suggestions[2]}}</a></p>
+    <p><a class="btn btn-lg btn-block" ng-class="{ 'btn-danger': played&&question.suggestions[0]!==question.smell.name , 'btn-success': played&&question.suggestions[0]===question.smell.name }" ng-click="submitAnswer(question.suggestions[0])">{{question.suggestions[0]}}</a></p>
+    <p><a class="btn btn-lg btn-block" ng-class="{ 'btn-danger': played&&question.suggestions[1]!==question.smell.name , 'btn-success': played&&question.suggestions[1]===question.smell.name }" ng-click="submitAnswer(question.suggestions[1])">{{question.suggestions[1]}}</a></p>
+    <p><a class="btn btn-lg btn-block" ng-class="{ 'btn-danger': played&&question.suggestions[2]!==question.smell.name , 'btn-success': played&&question.suggestions[2]===question.smell.name }" ng-click="submitAnswer(question.suggestions[2])">{{question.suggestions[2]}}</a></p>
   </div>
 
 </div>

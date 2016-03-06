@@ -3,19 +3,21 @@ package game
 import (
 	"encoding/json"
 	"fmt"
-	"golang.org/x/net/websocket"
 	"time"
+
+	"golang.org/x/net/websocket"
 )
 
 type Player struct {
-	Pseudo string          `json:"pseudo"`
-	Score  int             `json:"score"`
-	Ws     *websocket.Conn `json:"-"`
+	Pseudo          string          `json:"pseudo"`
+	Score           int             `json:"score"`
+	CurrentQuestion Question        `json:-`
+	Ws              *websocket.Conn `json:"-"`
 }
 
 type Response struct {
-	Step    int  `json:"step"`
-	Success bool `json:"success"`
+	Step  int    `json:"step"`
+	Value string `json:"value"`
 }
 
 func (p *Player) JoinAGame() {
@@ -48,9 +50,10 @@ func (p *Player) HandleEvents() {
 			return
 		}
 		fmt.Println("Received response from player", p.Pseudo, response)
-		if response.Success {
+		if response.Step == p.CurrentQuestion.Step && response.Value == p.CurrentQuestion.Smell.Name {
 			p.Score++
 		}
+		p.marshalAndSend(p.CurrentQuestion)
 	}
 }
 

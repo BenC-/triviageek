@@ -7,19 +7,20 @@ import (
 )
 
 const (
-	NumOfQuestionsPerGame = 4
-	QuestionPeriod        = 5
+	NumOfQuestionsPerGame = 12
+	QuestionPeriod        = 20
 )
 
 var runningGames []*Game
 
 type Game struct {
-	Name      string    `json:"name,omitempty"`
-	StartTime time.Time `json:"startTime,omitempty"`
-	Step      int       `json:"step,omitempty"`
-	ticker    *time.Ticker
-	players   []*Player
-	stopChan  chan interface{}
+	Name       string    `json:"name"`
+	StartTime  time.Time `json:"startTime"`
+	Step       int       `json:"step"`
+	ticker     *time.Ticker
+	players    []*Player
+	resultMask []bool
+	stopChan   chan interface{}
 }
 
 type Result struct {
@@ -27,9 +28,9 @@ type Result struct {
 }
 
 type Question struct {
-	Step        int      `json:"step,omitempty"`
-	Smell       Smell    `json:"smell,omitempty"`
-	Suggestions []string `json:"suggestions,omitempty"`
+	Step        int      `json:"step"`
+	Smell       Smell    `json:"smell"`
+	Suggestions []string `json:"suggestions"`
 }
 
 func newGame() *Game {
@@ -49,8 +50,10 @@ func (g *Game) start() {
 			fmt.Println(fmt.Sprintf("Send questions to %d player(s)", len(g.players)))
 			q := <-store
 			q.Step = g.Step
+			oq := obfuscateQuestion(q)
 			for _, player := range g.players {
-				player.marshalAndSend(q)
+				player.CurrentQuestion = q
+				player.marshalAndSend(oq)
 			}
 		case <-g.stopChan:
 			return
@@ -75,4 +78,16 @@ func randName() string {
 		b[i] = letters[rand.Intn(len(letters))]
 	}
 	return string(b)
+}
+
+func obfuscateQuestion(q Question) Question {
+	osmell := Smell{
+		Description: q.Smell.Description,
+	}
+	oq := Question{
+		Step:        q.Step,
+		Smell:       osmell,
+		Suggestions: q.Suggestions,
+	}
+	return oq
 }
